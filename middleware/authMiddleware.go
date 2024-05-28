@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,7 @@ func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		clientToken := c.Request.Header.Get("token")
 		if clientToken == "" {
+			log.Println("No Authorization header provided")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("No Authorization header provided")})
 			c.Abort()
 			return
@@ -19,6 +21,7 @@ func Authenticate() gin.HandlerFunc {
 
 		claims, err := helper.ValidateToken(clientToken)
 		if err != "" {
+			log.Println("Token validation error:", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			c.Abort()
 			return
